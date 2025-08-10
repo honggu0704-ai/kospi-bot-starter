@@ -1,0 +1,174 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Korea Market Updates API",
+    "version": "1.0.1",
+    "description": "KOSPI 최신 전자공시(DART)와 뉴스 집계 엔드포인트. since 미지정 시 서버가 KST 기준 -48h~+12h 윈도우로 처리합니다."
+  },
+  "servers": [
+    {
+      "url": "https://your-render-service.onrender.com"
+    }
+  ],
+  "paths": {
+    "/healthz": {
+      "get": {
+        "operationId": "healthz",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/updates": {
+      "get": {
+        "operationId": "getUpdates",
+        "summary": "Get latest DART filings and news for KOSPI companies",
+        "description": "최신 전자공시(DART)와 뉴스. since가 없으면 서버가 KST 기준 -48시간 ~ +12시간 윈도우로 처리하며, 결과는 published_at 내림차순입니다.",
+        "parameters": [
+          {
+            "name": "since",
+            "in": "query",
+            "description": "ISO8601 (예: 2025-08-09T00:00:00+09:00). 미지정 시 서버 기본 윈도우 사용.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "symbols",
+            "in": "query",
+            "description": "콤마로 구분한 종목코드/회사명 키워드(뉴스 검색 정밀도 향상용)",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 100
+            }
+          },
+          {
+            "name": "market",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "KOSPI",
+                "KOSDAQ",
+                "KONEX",
+                "ALL"
+              ],
+              "default": "KOSPI"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdatesResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key"
+      }
+    },
+    "schemas": {
+      "UpdateItem": {
+        "type": "object",
+        "required": [
+          "type",
+          "title",
+          "url",
+          "published_at"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "DART",
+              "NEWS"
+            ]
+          },
+          "symbol": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "published_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "score": {
+            "type": "number"
+          }
+        }
+      },
+      "UpdatesResponse": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UpdateItem"
+            }
+          }
+        }
+      }
+    }
+  }
+}

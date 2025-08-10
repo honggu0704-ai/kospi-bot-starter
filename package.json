@@ -1,0 +1,18 @@
+{
+  "name": "kospi-bot-starter",
+  "version": "1.0.1",
+  "description": "KOSPI DART filings and news aggregator API for GPTs Actions (Render-ready).",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18.x"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "luxon": "^3.5.0"
+  }
+}
