@@ -3,6 +3,9 @@ const express = require('express');
 const { DateTime } = require('luxon');
 const qs = require('qs');
 
+// [ADD] 우리가 만든 /src/routes/news.js 라우트 불러오기 (CommonJS)
+const newsRouter = require('./src/routes/news');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -126,6 +129,16 @@ async function fetchNaverNewsByKeywords(keywords) {
 app.get('/healthz', (req, res) => {
   res.json({ ok: true, tz: process.env.TZ || 'UTC' });
 });
+
+// [ADD] /news 라우트 연결 + API 키 체크 미들웨어
+app.use('/news', (req, res, next) => {
+  const incomingKey = req.get('X-API-Key');
+  const expected = process.env.BOT_API_KEY || process.env.API_KEY;
+  if (!incomingKey || incomingKey !== expected) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  next();
+}, newsRouter);
 
 // Updates
 app.get('/updates', async (req, res) => {
