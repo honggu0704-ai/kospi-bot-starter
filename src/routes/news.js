@@ -1,10 +1,10 @@
-// src/routes/news.js
-import express from 'express';
-import { getNaverNews } from '../services/naverNews.js';
+// src/routes/news.js  (CommonJS 버전)
+const express = require('express');
+const { getNaverNews } = require('../services/naverNews');
 
 const router = express.Router();
 
-// 예: GET /news?query=삼성전자&limit=10&sort=date
+// GET /news?query=삼성전자&limit=10&sort=date
 router.get('/', async (req, res) => {
   try {
     const { query, limit, start, sort } = req.query;
@@ -27,4 +27,4 @@ router.get('/', async (req, res) => {
   }
 });
 
-export default router;
+module.exports = router;
